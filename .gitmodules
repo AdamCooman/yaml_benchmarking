@@ -1,0 +1,3 @@
+[submodule "yaml"]
+	path = yaml
+	url = git@github.com:AdamCooman/yaml.git
