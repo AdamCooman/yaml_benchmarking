@@ -69,6 +69,15 @@ saveas(f,fullfile("results",filename+".svg"))
 yaml.dumpFile(fullfile("results",filename+".yaml"),results);
 
 function [stats,times] = benchmark(fun,number_of_outputs,name)
+% perfrom a few warmup runs
+for attempt = 1 : 10
+    if number_of_outputs == 0
+        fun();
+    else
+        out = fun();%#ok
+    end
+end
+% run the actual benchmarking runs
 number_of_attempts = 100;
 times = zeros(number_of_attempts,1);
 for attempt = 1 : number_of_attempts
@@ -76,12 +85,10 @@ for attempt = 1 : number_of_attempts
         tic;
         fun();
         times(attempt) = toc;
-    elseif number_of_outputs == 1
+    else
         tic;
         out = fun();%#ok
         times(attempt) = toc;
-    else
-        error("I only support up to one output")
     end
 end
 % return the statistics
