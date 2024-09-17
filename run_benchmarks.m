@@ -31,9 +31,18 @@ for file = test_files(:)'
     end
 end
 
-figure(1)
+results.commit = get_yaml_git_commit();
+results.user   = getenv('username');
+results.time   = datetime();
+results.time.Format = "uuuu-MM-dd";
+%%
+f = figure(1);
+f.Units = "pixels";
+f.Position = [50 50 900 400];
 clf
-subplot(121)
+t = tiledlayout(f,1,2);
+title(t,results.user+" "+string(results.time)+" "+results.commit);
+nexttile()
 errorbar(1:numel(results.load),[results.load.median], ...
     [results.load.median]-[results.load.min], ...
     [results.load.median]-[results.load.max],"b")
@@ -44,7 +53,7 @@ set(gca,"XTick",1:numel(results.load),"XTickLabel",[results.load.benchmark],"Tic
 title("Load")
 ylabel("Time [s]")
 
-subplot(122)
+nexttile()
 errorbar(1:numel(results.dump),[results.dump.median], ...
     [results.dump.median]-[results.dump.min], ...
     [results.dump.median]-[results.dump.max],"b")
@@ -54,6 +63,10 @@ grid on
 set(gca,"XTick",1:numel(results.dump),"XTickLabel",[results.dump.benchmark],"TickLabelInterpreter","none");
 title("Dump")
 ylabel("Time [s]")
+
+filename = string(results.time)+"_"+results.commit;
+saveas(f,fullfile("results",filename+".svg"))
+yaml.dumpFile(fullfile("results",filename+".yaml"),results);
 
 function [stats,times] = benchmark(fun,number_of_outputs,name)
 number_of_attempts = 100;
@@ -79,4 +92,13 @@ stats.median = median(times);
 stats.min = min(times);
 stats.max = max(times);
 stats.benchmark = name;
+end
+
+function res=get_yaml_git_commit()
+    old_dir = pwd();
+    cd("yaml")
+    [~,res] = system("git rev-parse HEAD");
+    cd(old_dir)
+    res = string(res);
+    res = replace(res,newline,"");
 end
