@@ -12,9 +12,10 @@ for file = test_files(:)'
     end
     disp("Running test: "+file.name)
     filepath = fullfile(file.folder,file.name);
-    data = yaml.loadFile(filepath);
+    file_data = readlines(filepath);
+    file_data = file_data.join(newline);
     % test loading
-    handle = @()yaml.loadFile(filepath);
+    handle = @()yaml.load(file_data);
     stats = benchmark(handle,1,string(replace(file.name,".yaml","")));
     if ~isfield(results,"load")
         results.load = stats;
@@ -22,8 +23,9 @@ for file = test_files(:)'
         results.load(end+1) = stats;
     end
     % test dumping
-    handle = @()yaml.dumpFile("temp.yaml",data);
-    stats = benchmark(handle,0,string(replace(file.name,".yaml","")));
+    data = yaml.loadFile(filepath);
+    handle = @()yaml.dump(data);
+    stats = benchmark(handle,1,string(replace(file.name,".yaml","")));
     if ~isfield(results,"dump")
         results.dump = stats;
     else
