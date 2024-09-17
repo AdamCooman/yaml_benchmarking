@@ -35,34 +35,12 @@ results.commit = get_yaml_git_commit();
 results.user   = getenv('username');
 results.time   = datetime();
 results.time.Format = "uuuu-MM-dd";
-%%
+
 f = figure(1);
 f.Units = "pixels";
 f.Position = [50 50 900 400];
 clf
-t = tiledlayout(f,1,2);
-title(t,results.user+" "+string(results.time)+" "+results.commit);
-nexttile()
-errorbar(1:numel(results.load),[results.load.median], ...
-    [results.load.median]-[results.load.min], ...
-    [results.load.median]-[results.load.max],"b")
-hold on
-plot(1:numel(results.load),[results.load.times],'b.')
-grid on
-set(gca,"XTick",1:numel(results.load),"XTickLabel",[results.load.benchmark],"TickLabelInterpreter","none");
-title("Load")
-ylabel("Time [s]")
-
-nexttile()
-errorbar(1:numel(results.dump),[results.dump.median], ...
-    [results.dump.median]-[results.dump.min], ...
-    [results.dump.median]-[results.dump.max],"b")
-hold on
-plot(1:numel(results.dump),[results.dump.times],'b.')
-grid on
-set(gca,"XTick",1:numel(results.dump),"XTickLabel",[results.dump.benchmark],"TickLabelInterpreter","none");
-title("Dump")
-ylabel("Time [s]")
+plot_result(results,"result")
 
 filename = string(results.time)+"_"+results.commit;
 saveas(f,fullfile("results",filename+".svg"))
